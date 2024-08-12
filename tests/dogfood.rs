@@ -65,7 +65,7 @@ fn collect_metadata() {
     assert!(cfg!(feature = "internal"));
 
     // Setup for validation
-    let metadata_output_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("util/gh-pages/lints.json");
+    let metadata_output_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("util/gh-pages/index.html");
     let start_time = SystemTime::now();
 
     // Run collection as is
