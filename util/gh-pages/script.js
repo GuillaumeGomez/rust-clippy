@@ -211,8 +211,8 @@ function copyToClipboard(event) {
     resetClipboardTimeout = setTimeout(resetClipboard, 1000);
 }
 
-function handleBlur(event) {
-    const parent = document.getElementById("settings-dropdown");
+function handleBlur(event, elementId) {
+    const parent = document.getElementById(elementId);
     if (!parent.contains(document.activeElement) &&
         !parent.contains(event.relatedTarget)
     ) {
@@ -243,22 +243,28 @@ function generateListOfOptions(list, elementId) {
         }
     }
 
-    const elem = document.getElementById(elementId);
+    const elem = document.getElementById(`${elementId}-selector`);
     elem.previousElementSibling.querySelector(".badge").innerText = `${nbEnabled}`;
     elem.innerHTML += html;
+
+    setupDropdown(elementId);
+}
+
+function setupDropdown(elementId) {
+    const elem = document.getElementById(elementId);
+    const button = document.querySelector(`#${elementId} > button`);
+    button.onclick = () => elem.classList.toggle("open");
+
+    onEachLazy(elem.children, child => {
+        child.onblur = event => handleBlur(event, elementId);
+    });
+    onEachLazy(elem.querySelectorAll("input"), child => {
+        child.onblur = event => handleBlur(event, elementId);
+    });
 }
 
 function generateSettings() {
-    const settings = document.getElementById("settings-dropdown");
-    const settingsButton = settings.querySelector(".settings-icon")
-    settingsButton.onclick = () => settings.classList.toggle("open");
-    settingsButton.onblur = handleBlur;
-    const settingsMenu = settings.querySelector(".settings-menu");
-    settingsMenu.onblur = handleBlur;
-    onEachLazy(
-        settingsMenu.querySelectorAll("input"),
-        el => el.onblur = handleBlur,
-    );
+    setupDropdown("settings-dropdown");
 
     const LEVEL_FILTERS_DEFAULT = {allow: true, warn: true, deny: true, none: true};
     generateListOfOptions(LEVEL_FILTERS_DEFAULT, "lint-levels");
@@ -287,12 +293,6 @@ function generateSettings() {
     };
     generateListOfOptions(APPLICABILITIES_FILTER_DEFAULT, "lint-applicabilities");
 
-    const VERSIONS_FILTERS = {
-        "≥": {enabled: false, minorVersion: null },
-        "≤": {enabled: false, minorVersion: null },
-        "=": {enabled: false, minorVersion: null },
-    };
-
     let html = '';
     for (const kind of ["≥", "≤", "="]) {
         html += `\
@@ -309,6 +309,7 @@ function generateSettings() {
 </li>`;
     }
     document.getElementById("version-filter-selector").innerHTML += html;
+    setupDropdown("version-filter");
 }
 
 function generateSearch() {
