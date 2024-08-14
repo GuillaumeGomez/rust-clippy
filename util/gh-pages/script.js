@@ -151,6 +151,14 @@ function handleShortcut(ev) {
 document.addEventListener("keypress", handleShortcut);
 document.addEventListener("keydown", handleShortcut);
 
+function toggleElements(element, value) {
+    // `element` is always a button in a `li` in a `ul`. We want the `input` in the `ul`.
+    onEachLazy(
+        element.parentElement.parentElement.getElementsByTagName("input"),
+        el => el.checked = value,
+    );
+}
+
 function changeSetting(elem) {
     if (elem.id === "disable-shortcuts") {
         disableShortcuts = elem.checked;
@@ -227,6 +235,30 @@ function toggleExpansion(expand) {
     );
 }
 
+function clearVersionFilters() {
+    onEachLazy(document.querySelectorAll("#version-filter-count input"), el => el.value = "");
+}
+
+const GROUPS_FILTER_DEFAULT = {
+    cargo: true,
+    complexity: true,
+    correctness: true,
+    deprecated: false,
+    nursery: true,
+    pedantic: true,
+    perf: true,
+    restriction: true,
+    style: true,
+    suspicious: true,
+};
+
+function resetGroupsToDefault() {
+    onEachLazy(document.querySelectorAll("#lint-groups-selector input"), el => {
+        const key = el.getAttribute("data-value");
+        el.checked = GROUPS_FILTER_DEFAULT[key];
+    });
+}
+
 function generateListOfOptions(list, elementId) {
     let html = '';
     let nbEnabled = 0;
@@ -235,7 +267,7 @@ function generateListOfOptions(list, elementId) {
         html += `\
 <li class="checkbox">\
     <label class="text-capitalize">\
-        <input type="checkbox"${attr}/>${key}\
+        <input type="checkbox" data-value="${key}"${attr}/>${key}\
     </label>\
 </li>`;
         if (value) {
@@ -255,12 +287,12 @@ function setupDropdown(elementId) {
     const button = document.querySelector(`#${elementId} > button`);
     button.onclick = () => elem.classList.toggle("open");
 
-    onEachLazy(elem.children, child => {
+    const setBlur = child => {
         child.onblur = event => handleBlur(event, elementId);
-    });
-    onEachLazy(elem.querySelectorAll("input"), child => {
-        child.onblur = event => handleBlur(event, elementId);
-    });
+    };
+    onEachLazy(elem.children, setBlur);
+    onEachLazy(elem.querySelectorAll("input"), setBlur);
+    onEachLazy(elem.querySelectorAll("ul button"), setBlur);
 }
 
 function generateSettings() {
@@ -270,18 +302,6 @@ function generateSettings() {
     generateListOfOptions(LEVEL_FILTERS_DEFAULT, "lint-levels");
 
     // Generate lint groups.
-    const GROUPS_FILTER_DEFAULT = {
-        cargo: true,
-        complexity: true,
-        correctness: true,
-        deprecated: false,
-        nursery: true,
-        pedantic: true,
-        perf: true,
-        restriction: true,
-        style: true,
-        suspicious: true,
-    };
     generateListOfOptions(GROUPS_FILTER_DEFAULT, "lint-groups");
 
     const APPLICABILITIES_FILTER_DEFAULT = {

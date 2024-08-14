@@ -327,6 +327,18 @@ L4.75,12h2.5l0.5393066-2.1572876  c0.2276001-0.1062012,0.4459839-0.2269287,0.649
     display: flex;
 }
 
+ul.dropdown-menu li.checkbox > button {
+    border: 0;
+    width: 100%;
+    background: var(--theme-popup-bg);
+    color: var(--fg);
+}
+
+ul.dropdown-menu li.checkbox > button:hover {
+    background: var(--theme-hover);
+    box-shadow: none;
+}
+
 #version-filter {
     min-width: available;
 }
