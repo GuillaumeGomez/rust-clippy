@@ -257,13 +257,13 @@ const GROUPS_FILTER_DEFAULT = {
     cargo: true,
     complexity: true,
     correctness: true,
-    deprecated: false,
     nursery: true,
     pedantic: true,
     perf: true,
     restriction: true,
     style: true,
     suspicious: true,
+    deprecated: false,
 };
 const LEVEL_FILTERS_DEFAULT = {
     allow: true,
@@ -273,7 +273,6 @@ const LEVEL_FILTERS_DEFAULT = {
 };
 const APPLICABILITIES_FILTER_DEFAULT = {
     Unspecified: true,
-    Unresolved: true,
     MachineApplicable: true,
     MaybeIncorrect: true,
     HasPlaceholders: true,
