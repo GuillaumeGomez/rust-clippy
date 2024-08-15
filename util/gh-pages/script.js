@@ -46,17 +46,6 @@ function setTheme(theme, store) {
     }
 }
 
-// loading the theme after the initial load
-const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
-const theme = loadValue('theme');
-if (prefersDark.matches && !theme) {
-    setTheme("coal", false);
-} else {
-    setTheme(theme, false);
-}
-let disableShortcuts = loadValue('disable-shortcuts') === "true";
-document.getElementById("disable-shortcuts").checked = disableShortcuts;
-
 window.searchState = {
     timeout: null,
     inputElem: document.getElementById("search-input"),
@@ -160,9 +149,6 @@ function handleShortcut(ev) {
         }
     }
 }
-
-document.addEventListener("keypress", handleShortcut);
-document.addEventListener("keydown", handleShortcut);
 
 function toggleElements(filter, value) {
     let needsUpdate = false;
@@ -570,9 +556,6 @@ function generateSearch() {
     searchState.inputElem.addEventListener("paste", handleInputChanged);
 }
 
-generateSettings();
-generateSearch();
-
 function scrollToLint(lintId) {
     const target = document.getElementById(lintId);
     if (!target) {
@@ -617,7 +600,28 @@ function parseURLFilters() {
     }
 }
 
-parseURLFilters();
-scrollToLintByURL();
-filters.filterLints();
-onEachLazy(document.querySelectorAll("pre > code.language-rust"), el => hljs.highlightElement(el));
+// loading the theme after the initial load
+const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+const theme = loadValue('theme');
+if (prefersDark.matches && !theme) {
+    setTheme("coal", false);
+} else {
+    setTheme(theme, false);
+}
+
+let disableShortcuts = loadValue('disable-shortcuts') === "true";
+// To prevent having a "flash", we give back time to the web browser to finish rendering with
+// theme applied before finishing the rendering.
+setTimeout(() => {
+    document.getElementById("disable-shortcuts").checked = disableShortcuts;
+
+    document.addEventListener("keypress", handleShortcut);
+    document.addEventListener("keydown", handleShortcut);
+
+    generateSettings();
+    generateSearch();
+    parseURLFilters();
+    scrollToLintByURL();
+    filters.filterLints();
+    onEachLazy(document.querySelectorAll("pre > code.language-rust"), el => hljs.highlightElement(el));
+}, 0);
