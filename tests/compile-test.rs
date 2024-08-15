@@ -396,7 +396,7 @@ struct Renderer<'a> {
 }
 
 impl<'a> Renderer<'a> {
-    fn markdown(&self, input: &str) -> Safe<String> {
+    fn markdown(input: &str) -> Safe<String> {
         let parser = Parser::new_ext(input, Options::all());
         let mut html_output = String::new();
         html::push_html(&mut html_output, parser);
