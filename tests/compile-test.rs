@@ -8,8 +8,9 @@ use clippy_config::ClippyConfiguration;
 use clippy_lints::declared_lints::LINTS;
 use clippy_lints::deprecated_lints::{DEPRECATED, DEPRECATED_VERSION, RENAMED};
 use clippy_lints::LintInfo;
-use pulldown_cmark::{Options, Parser, html};
-use rinja::{Template, filters::Safe};
+use pulldown_cmark::{html, Options, Parser};
+use rinja::filters::Safe;
+use rinja::Template;
 use serde::Deserialize;
 use test_utils::IS_RUSTC_TEST_SUITE;
 use ui_test::custom_flags::rustfix::RustfixMode;
@@ -466,7 +467,11 @@ impl DiagnosticCollector {
                 .collect();
             metadata.sort_unstable_by(|a, b| a.id.cmp(&b.id));
 
-            fs::write("util/gh-pages/index.html", Renderer { lints: &metadata }.render().unwrap()).unwrap();
+            fs::write(
+                "util/gh-pages/index.html",
+                Renderer { lints: &metadata }.render().unwrap(),
+            )
+            .unwrap();
         });
 
         (Self { sender }, handle)
